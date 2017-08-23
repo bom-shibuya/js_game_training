@@ -1,0 +1,91 @@
+//- include layout
+extends /_inc/templates/_layout.pug
+
+//- meta 定義
+block meta
+  -
+    var pageSet = {
+      title: 'トップページ',
+      description: 'トップページの説明が入ります。',
+      imageUrl: '/'+setting.imgPath+'/bg01.jpg',
+      type: 'article'
+    }
+
+  +metaList(pageSet)
+
+
+//- コンテンツ
+block contents
+  canvas#canvas
+  p speed1
+
+  script.
+    let ctx;
+    let posX = 0;
+    let velocityX = 1;
+    let accelX = 1;
+    const w = window.innerWidth;
+    const h = window.innerHeight;
+    let direction = true;
+
+    const init = () => {
+      window.addEventListener('DOMContentLoaded', () => {
+        const c = document.getElementById('canvas');
+        c.width = w;
+        c.height = h;
+        ctx = c.getContext('2d');
+        //- setInterval(tick, 100);
+        tick();
+      });
+
+    };
+
+    const tick = () => {
+
+      if (direction) {
+        if (posX > w) {
+          direction = false;
+          velocityX = 1;
+        } 
+        if(posX < w / 3) {
+          velocityX += accelX;
+          posX += velocityX;
+        } else if (posX > w / 3 * 2) {
+          velocityX -= accelX;
+          posX += velocityX;
+        } else {
+          posX += velocityX;
+        }
+      } else {
+        if (posX < 0) {
+          velocityX = 1;
+          direction = true;
+        }
+        if(posX < w / 3) {
+          velocityX += accelX;
+          posX -= velocityX;
+        } else if (posX > w / 3 * 2) {
+          velocityX += accelX;
+          posX -= velocityX;
+        } else {
+          posX -= velocityX;
+        }
+
+      }
+
+      paint();
+      window.requestAnimationFrame(tick);
+    };
+
+    const paint = () => {
+      
+      ctx.fillStyle = 'black';
+      ctx.fillRect(0, 0, w, h);
+      ctx.fillStyle = 'white';
+      ctx.fillRect(posX, 200, 10, 10);
+      ctx.fill();
+      //- console.log(ctx)
+      //- console.log('dddd')
+    };
+
+    init();

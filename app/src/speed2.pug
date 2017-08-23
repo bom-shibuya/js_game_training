@@ -26,8 +26,13 @@ block contents
     let velocityX = 5;
     let velocityY = -20;
     let accelY = 0.5;
+    let accelX = 0.1;
     let w = window.innerWidth;
     let h = window.innerHeight;
+    let bound = 10;
+    let duration = 0;
+    let boxW = 10;
+    let boxH = 10;
 
     const init = () => {
       const c = document.getElementById('canvas');
@@ -39,20 +44,35 @@ block contents
 
     const tick = () => {
       posX += velocityX;
-      velocityY += accelY;
-      posY += velocityY;
-
       if (posX > w) posX = 0;
-      if (posY > y) veloctyY = -20;
+      if (posY > h) {
+        velocityY = -2 * bound;
+        --bound
+      };
 
-      paint();
-      requestAnimationFrame(tick);
+      if (bound === 0) {
+        posY = h;
+        ++duration
+        if (duration < 40) {
+          velocityX -= accelX;
+          paint();
+          requestAnimationFrame(tick);
+        }
+      } else {
+        velocityY += accelY;
+        posY += velocityY;
+        paint();
+        requestAnimationFrame(tick);
+      }
+
     };
 
     const paint = () => {
       ctx.fillStyle = 'black';
-      ctx.fillRect(0, 0, w, y);
+      ctx.fillRect(0, 0, w, h);
       ctx.fillStyle = 'white';
-      ctx.fillRect(posX, posY, 10, 10);
+      ctx.fillRect(posX, posY - boxH, boxW, boxH);
       ctx.fill();
     };
+
+    init();

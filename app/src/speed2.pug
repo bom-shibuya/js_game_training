@@ -1,0 +1,58 @@
+//- include layout
+extends /_inc/templates/_layout.pug
+
+//- meta 定義
+block meta
+  -
+    var pageSet = {
+      title: 'トップページ',
+      description: 'トップページの説明が入ります。',
+      imageUrl: '/'+setting.imgPath+'/bg01.jpg',
+      type: 'article'
+    }
+
+  +metaList(pageSet)
+
+
+//- コンテンツ
+block contents
+  canvas#canvas
+  p speed2
+
+  script.
+    let ctx;
+    let posX = 0;
+    let posY = 600;
+    let velocityX = 5;
+    let velocityY = -20;
+    let accelY = 0.5;
+    let w = window.innerWidth;
+    let h = window.innerHeight;
+
+    const init = () => {
+      const c = document.getElementById('canvas');
+      c.width = w;
+      c.height = h;
+      ctx = c.getContext('2d');
+      tick();
+    };
+
+    const tick = () => {
+      posX += velocityX;
+      velocityY += accelY;
+      posY += velocityY;
+
+      if (posX > w) posX = 0;
+      if (posY > y) veloctyY = -20;
+
+      paint();
+      requestAnimationFrame(tick);
+    };
+
+    const paint = () => {
+      ctx.fillStyle = 'black';
+      ctx.fillRect(0, 0, w, y);
+      ctx.fillStyle = 'white';
+      ctx.fillRect(posX, posY, 10, 10);
+      ctx.fill();
+    };

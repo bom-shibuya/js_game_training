@@ -1,0 +1,83 @@
+//- include layout
+extends /_inc/templates/_layout.pug
+
+//- meta 定義
+block meta
+  -
+    var pageSet = {
+      title: 'トップページ',
+      description: 'トップページの説明が入ります。',
+      imageUrl: '/'+setting.imgPath+'/bg01.jpg',
+      type: 'article'
+    }
+
+  +metaList(pageSet)
+
+
+//- コンテンツ
+block contents
+  canvas#canvas
+  p triangleFunction1
+  input#theta(type="range", min="0", max="360" value="0", onChange="update()")
+  p
+    | 中心角
+    span#degree 0
+
+
+  script.
+    let ctx;
+    let degree = 0;
+    let w = window.innerWidth;
+    let h = window.innerHeight;
+
+    const init = () => {
+      const c = document.getElementById('canvas');
+      c.width = w;
+      c.height = h;
+      ctx = c.getContext('2d');
+      paint();
+    };
+
+    const update = () => {
+      degree = document.getElementById('theta').value;
+      document.getElementById('degree').textContent = degree;
+      paint();
+    };
+
+
+    const drawLine = (x0, y0, x1, y1, color) => {
+      ctx.strokeStyle = color;
+      ctx.beginPath();
+      ctx.moveTo(x0, y0);
+      ctx.lineTo(x1, y1);
+      ctx.closePath();
+      ctx.stroke();
+    };
+
+    const paint = () => {
+      ctx.fillStyle = 'white';
+      ctx.fillRect(0, 0, w, h);
+      ctx.save();
+      ctx.translate(w / 2, h / 2);
+
+      drawLine(0, -300, 0, 300, 'black');
+      drawLine(-300, 0, 300, 0, 'black');
+
+      let sin0 = Math.sin(degree * Math.PI / 180).toFixed(3);
+      let cos0 = Math.cos(degree * Math.PI / 180).toFixed(3);
+      let sin = sin0 * 200;
+      let cos = cos0 * -200;
+
+      drawLine(0, 0, cos, sin, 'red');
+      ctx.arc(0, 0, 200, 0, Math.PI * 2);
+      ctx.stroke();
+
+      //- ラベル
+      drawLine(cos, sin, cos, 0, 'blue');
+      ctx.strokeText('cos:' + cos0, cos - 10, 20);
+      drawLine(cos, sin, 0, sin, 'green');
+      ctx.strokeText('sin:' + sin0, 40, sin - 10);
+      ctx.restore();
+    };
+
+    init();

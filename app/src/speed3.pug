@@ -1,0 +1,97 @@
+//- include layout
+extends /_inc/templates/_layout.pug
+
+//- meta 定義
+block meta
+  -
+    var pageSet = {
+      title: 'トップページ',
+      description: 'トップページの説明が入ります。',
+      imageUrl: '/'+setting.imgPath+'/bg01.jpg',
+      type: 'article'
+    }
+
+  +metaList(pageSet)
+
+
+//- コンテンツ
+block contents
+  canvas#canvas
+  p speed3
+
+  script.
+    let ctx;
+    let isFlying = false;
+    let timer;
+    let offset = 0;
+    let speed = 10;
+    let velocityX = 5;
+    let velocityY = -20;
+    let accelY = 5  ;
+    let accelX = 0.1;
+    let w = window.innerWidth;
+    let h = window.innerHeight;
+    let boxW = 10;
+    let boxH = 10;
+    let posX = 0;
+    let posY = 300;
+
+    const init = () => {
+      const c = document.getElementById('canvas');
+      c.width = w;
+      c.height = h;
+      ctx = c.getContext('2d');
+      ctx.font = '24px sas-serif';
+      onkeydown = () => {isFlying = true; console.log('press')};
+      onkeyup = () => isFlying = false;
+      timer = setInterval(tick, 100);
+    };
+
+    const tick = () => {
+      velocityY += isFlying ? -accelY : accelY;
+      posY += velocityY;
+      offset += speed;
+      if (offset % 100 === 0) {
+        speed += 2;
+      }
+      paint();
+    };
+
+    const paint = () => {
+      ctx.fillStyle = 'green';
+      ctx.fillRect(0, 0, w, h);
+      ctx.fillStyle = 'brown';
+      ctx.beginPath();
+      ctx.moveTo(0, 0);
+      
+      for (let i = 0; i <= w; i += 10) {
+        const up = 200 + Math.sin(
+          (i + offset) * Math.PI / 360
+        ) * 80;
+
+        ctx.lineTo(i, up);
+        if (i === 10 && posY < up) clearInterval(timer); 
+      }
+      ctx.lineTo(w, 0);
+      ctx.fill();
+      
+      ctx.beginPath();
+      ctx.moveTo(0, h);
+      for (let i = 0; i <= w; i += 10) {
+
+        const down = 400 + Math.sin(
+          (i + offset) * Math.PI / 340
+        ) * 80;
+
+        ctx.lineTo(i, down);
+        if (i === 10 && posY + 10 > down) clearInterval(timer); 
+      }
+      ctx.lineTo(w, h);
+      ctx.fill();
+
+      ctx.fillStyle = 'white';
+      ctx.fillRect(10, posY, boxW, boxH);
+      ctx.fillText(offset, 500, 50);
+    };
+
+    init();

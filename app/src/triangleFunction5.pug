@@ -1,0 +1,115 @@
+//- include layout
+extends /_inc/templates/_layout.pug
+
+//- meta 定義
+block meta
+  -
+    var pageSet = {
+      title: 'トップページ',
+      description: 'トップページの説明が入ります。',
+      imageUrl: '/'+setting.imgPath+'/bg01.jpg',
+      type: 'article'
+    }
+
+  +metaList(pageSet)
+
+
+//- コンテンツ
+block contents
+  canvas#canvas
+
+  script.
+    let ctx;
+    let fires = [];
+    let w = window.innerWidth;
+    let h = window.innerHeight;
+    
+    const random = limit => Math.floor(Math.random() * limit);
+
+    class FireWorks {
+      constructor(color, radius) {
+        this.color = color;
+        thsi.radius = radius;
+        this.x = null;
+        this.y = null;
+        this.xSpeed = null;
+        this.ySpeed = null;
+        this.initialize();
+      }
+      
+      initialize() {
+        this.count = 0;
+        this.scale = 0;
+        this.x = random(w);
+        this.y = h + random(20);
+        this.xSpeed = -3 + random(6);
+        this.ySpeed = -3 - random(8);
+      };
+
+      move() {
+        this.x += this.xSpeed;
+        this.y += this.ySpeed;
+        
+        this.ySpeed += 0.1;
+        this.ySpeed /= 1.01;
+      }
+
+      draw() {
+        if (this.ySpeed < -1) {
+          ctx.fillStyle = this.color;
+          ctx.beginPath();
+          ctx.arc(this.x, this.y, 4 , 0, Math.PI * 2);
+          ctx.fill();
+        } else {
+          this.coubnt++;
+          for (let t = 0; t < 4; t++) {
+            this.scale += 0.06 / this.count;
+            const rad  = this.radius * this.scale;
+            for (let i = 0; i < Math.PI * 2; i += 0.6) {
+              let dx = Math.cos(i) * rad;
+              let dy = Math.sin(i) * rad;
+              ctx.fillStyle = this.color;
+              ctx.beginPath();
+              ctx.arc(this.x + dx, this.y + dy, 2, 0, Math.PI * 2);
+              ctx.fill();
+            }
+          }
+
+          if (this.count > 30) {
+            this.initialize();
+          }
+        }
+      }
+    }
+
+    const init = () => {
+      const c = document.getElementById('canvas');
+      c.width = w;
+      c.height = h;
+      ctx = c.getContext('2d');
+      ctx.globalAlpha = 0.3;
+      
+      const colors = ['#ff0000', '#ffff00', '#ffffff', '#ff00ff', '#00ff00', '#7F7FFF', '#00ffff'];
+      for (let i = 0; i < 14; i++) {
+        fires.push(new Fireworks(colors[i % 7]), random(60) + 60);
+      }
+      tick();
+    };
+
+
+
+    const tick = () => {
+      fires.forEach(e => e.move());
+      paint();
+      requestAnimationFrame(tick);
+    };
+
+    const paint = () => {
+      ctx.fillStyle = 'black';
+      ctx.fillRect(0, 0, w, h);
+      fires.forEach(e => e.draw());
+
+    };
+      console.log(Fireworks)
+
+    init();

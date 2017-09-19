@@ -1,0 +1,87 @@
+//- include layout
+extends /_inc/templates/_layout.pug
+
+//- meta 定義
+block meta
+  -
+    var pageSet = {
+      title: 'トップページ',
+      description: 'トップページの説明が入ります。',
+      imageUrl: '/'+setting.imgPath+'/bg01.jpg',
+      type: 'article'
+    }
+
+  +metaList(pageSet)
+
+
+//- コンテンツ
+block contents
+  canvas#canvas
+
+  script.
+    let ctx;
+    let snowTimer = 0;
+    let snows = [];
+    let w = window.innerWidth;
+    let h = window.innerHeight;
+    
+    const random = limit => Math.floor(Math.random() * limit);
+
+    class Snow {
+      constructor() {
+        this.x = random(w);
+        this.y = -10;
+        this.drift = Math.random();
+        this.speed = random(5) + 1;
+        this.width = random(3) + 2;
+        this.height = this.width;
+        this.theta = random(100);
+        this.radius = random(10) + 3;
+      }
+    }
+
+    const addSnow = () => {
+      snows.push(new Snow());
+      if (snows.length >= 100) {
+        clearInterval(snowTimer);
+      }
+    };
+
+    const init = () => {
+      const c = document.getElementById('canvas');
+      c.width = w;
+      c.height = h;
+      ctx = c.getContext('2d');
+      ctx.globalAlpha = 0.6;
+      snowTimer = setInterval(addSnow, 200);
+      tick();
+    };
+
+
+
+    const tick = () => {
+      for (let i = 0; i < snows.length; i++) {
+        snows[i].y += snows[i].speed;
+        if (snows[i].y > h) {
+          snows[i].y = -5;
+        }
+        snows[i].x += snows[i].drift;
+        if (snows[i].x > w) {
+          snows[i].x = 0;
+        }
+        snows[i].theta += 0.1;
+      }
+      paint();
+      requestAnimationFrame(tick);
+    };
+
+    const paint = () => {
+      ctx.fillStyle = 'black';
+      ctx.fillRect(0, 0, w, h);
+      ctx.fillStyle = 'white';
+      snows.forEach(s => {
+        ctx.fillRect(s.x + Math.sin(s.theta) * s.radius, s.y, s.width, s.height);
+      });
+    };
+
+    init();
